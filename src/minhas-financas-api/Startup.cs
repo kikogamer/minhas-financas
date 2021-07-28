@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using minhas_financas_api.Configuration;
 
 namespace minhas_financas_api
 {
@@ -29,7 +30,8 @@ namespace minhas_financas_api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddWebApiConfiguration();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Minhas Finanças API", Version = "v1" });
@@ -46,11 +48,9 @@ namespace minhas_financas_api
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "minhas_financas_api v1"));
             }
 
-            app.UseHttpsRedirection();
+            app.UseWebApiConfiguration();
 
-            app.UseRouting();
-
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
