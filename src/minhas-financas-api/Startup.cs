@@ -32,7 +32,7 @@ namespace minhas_financas_api
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "minhas_financas_api", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Minhas Finanças API", Version = "v1" });
             });
         }
 
