@@ -23,6 +23,12 @@ namespace minhas_financas_api.Configuration
                 options.SubstituteApiVersionInUrl = true;
             });
 
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+
+            });
+
             return services;
         }
 
