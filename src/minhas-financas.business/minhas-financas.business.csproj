@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>minhas_financas_business</RootNamespace>
+    <RootNamespace>minhas_financas.business</RootNamespace>
   </PropertyGroup>
 
 </Project>
