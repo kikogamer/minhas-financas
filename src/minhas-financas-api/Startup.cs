@@ -33,6 +33,8 @@ namespace minhas_financas_api
             services.AddWebApiConfiguration();
 
             services.AddSwaggerConfiguration();
+
+            services.ResolveDependencies();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
