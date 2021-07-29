@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using minhas_financas.api.Controllers;
-using System.Threading.Tasks;
+using minhas_financas.api.V1.ViewModels;
 
 namespace minhas_financas.api.V1.Controllers
 {
@@ -10,9 +10,9 @@ namespace minhas_financas.api.V1.Controllers
     {
 
         [HttpPost]
-        public async Task<ActionResult> Registrar()
+        public ActionResult Registrar(CreateUserViewModel createUser)
         {
-            return Ok();
+            return Ok(createUser);
         }
     }
 }

@@ -1,3 +1,3 @@
 /.vs
-/src/minhas-financas-api/obj
-/src/minhas-financas-api/bin
+bin
+obj
