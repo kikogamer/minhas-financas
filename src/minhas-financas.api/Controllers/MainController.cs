@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using minhas_financas.business.Interfaces;
 using minhas_financas.business.Notificacoes;
+using System;
 using System.Linq;
 
 namespace minhas_financas.api.Controllers
@@ -21,6 +22,24 @@ namespace minhas_financas.api.Controllers
             return !_notificador.TemNotificacao();
         }
 
+        protected ActionResult CustomCreatedResponse(string uri, Guid id, object result = null)
+        {
+            if (OperacaoValida())
+            {
+                return CreatedAtAction(uri, new { id = id }, new
+                {
+                    success = true,
+                    data = result
+                });      
+            }
+
+            return BadRequest(new
+            {
+                success = false,
+                errors = _notificador.ObterNotificacoes().Select(n => n.Mensagem)
+            });
+        }
+                
         protected ActionResult CustomResponse(object result = null)
         {
             if (OperacaoValida())
