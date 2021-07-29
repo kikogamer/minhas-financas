@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using minhas_financas.business.Interfaces;
+using minhas_financas.business.Notificacoes;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace minhas_financas.api.Configuration
