@@ -30,6 +30,8 @@ namespace minhas_financas.api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddIdentityConfiguration(Configuration);
+            
             services.AddWebApiConfiguration();
 
             services.AddSwaggerConfiguration();
@@ -46,9 +48,9 @@ namespace minhas_financas.api
                 app.UseSwaggerConfiguration(provider);
             }
 
-            app.UseWebApiConfiguration();
+            app.UseAuthorization();
 
-            //app.UseAuthorization();
+            app.UseWebApiConfiguration();
 
             app.UseEndpoints(endpoints =>
             {
