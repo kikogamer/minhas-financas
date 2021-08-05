@@ -4,10 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace minhas_financas.api.Configuration
 {
+    [ExcludeFromCodeCoverage]
     public static class SwaggerConfiguration
     {
         public static IServiceCollection AddSwaggerConfiguration(this IServiceCollection services)
@@ -37,6 +39,7 @@ namespace minhas_financas.api.Configuration
         }
     }
 
+    [ExcludeFromCodeCoverage]
     public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
     {
         readonly IApiVersionDescriptionProvider provider;
@@ -73,6 +76,7 @@ namespace minhas_financas.api.Configuration
         }
     }
 
+    [ExcludeFromCodeCoverage]
     public class SwaggerDefaultValues : IOperationFilter
     {
         public void Apply(OpenApiOperation operation, OperationFilterContext context)

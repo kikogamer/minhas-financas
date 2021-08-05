@@ -5,9 +5,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using minhas_financas.api.Configuration;
+using System.Diagnostics.CodeAnalysis;
 
 namespace minhas_financas.api
 {
+    [ExcludeFromCodeCoverage]
     public class Startup
     {
         public IConfiguration Configuration { get; }

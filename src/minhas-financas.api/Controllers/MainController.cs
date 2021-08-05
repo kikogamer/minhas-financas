@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using minhas_financas.api.V1.ViewModels;
 using minhas_financas.business.Interfaces;
 using minhas_financas.business.Notificacoes;
 using System.Linq;
@@ -24,37 +25,18 @@ namespace minhas_financas.api.Controllers
         protected ActionResult CustomCreatedResponse(string uri, string id, object result = null)
         {
             if (OperacaoValida())
-            {
-                return CreatedAtAction(uri, new { id = id }, new
-                {
-                    success = true,
-                    data = result
-                });      
-            }
-
-            return BadRequest(new
-            {
-                success = false,
-                errors = _notificador.ObterNotificacoes().Select(n => n.Mensagem)
-            });
+                return CreatedAtAction(uri, new { id = id }, new ApiCreatedResponse(true, result));
+            
+            var erros = _notificador.ObterNotificacoes().Select(n => n.Mensagem).ToList();
+            return BadRequest(new ApiBadRequestResponse(false, erros));
         }
                 
         protected ActionResult CustomResponse(object result = null)
         {
-            if (OperacaoValida())
-            {
-                return Ok(new
-                {
-                    success = true,
-                    data = result
-                });
-            }
-
-            return BadRequest(new
-            {
-                success = false,
-                errors = _notificador.ObterNotificacoes().Select(n => n.Mensagem)
-            });
+            if (OperacaoValida()) return Ok(new ApiOkResponse(true, result));
+            
+            var erros = _notificador.ObterNotificacoes().Select(n => n.Mensagem).ToList();
+            return BadRequest(new ApiBadRequestResponse(false, erros));
         }
 
         protected ActionResult CustomResponse(ModelStateDictionary modelState)

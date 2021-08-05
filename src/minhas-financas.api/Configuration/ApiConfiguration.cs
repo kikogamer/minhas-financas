@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace minhas_financas.api.Configuration
 {
+    [ExcludeFromCodeCoverage]
     public static class ApiConfiguration
     {
         public static IServiceCollection AddWebApiConfiguration(this IServiceCollection services)
