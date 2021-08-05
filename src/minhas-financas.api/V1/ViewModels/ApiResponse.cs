@@ -4,7 +4,7 @@ namespace minhas_financas.api.V1.ViewModels
 {
     public abstract class ApiResponse
     {
-        public readonly bool Success;
+        public bool Success { get; }
 
         public ApiResponse(bool success)
         {
@@ -14,7 +14,7 @@ namespace minhas_financas.api.V1.ViewModels
 
     public class ApiOkResponse : ApiResponse
     {
-        public readonly object Data;
+        public object Data { get; }
 
         public ApiOkResponse(bool success, object data) : base(success)
         {
@@ -29,7 +29,7 @@ namespace minhas_financas.api.V1.ViewModels
 
     public class ApiBadRequestResponse : ApiResponse
     {
-        public readonly List<string> Erros;
+        public List<string> Erros { get; }
 
         public ApiBadRequestResponse(bool success, List<string> erros) : base(success)
         {

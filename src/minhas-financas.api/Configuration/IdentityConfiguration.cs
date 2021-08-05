@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using minhas_financas.api.Data;
 using minhas_financas.api.Extensions;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
@@ -26,7 +27,13 @@ namespace minhas_financas.api.Configuration
                 .AddErrorDescriber<IdentityMensagensPortugues>()
                 .AddDefaultTokenProviders();
 
-            //jwt configuration
+            AddJwtConfiguration(services, configuration);
+
+            return services;
+        }
+
+        private static void AddJwtConfiguration(IServiceCollection services, IConfiguration configuration)
+        {
             var appSettingsSection = configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
@@ -51,8 +58,6 @@ namespace minhas_financas.api.Configuration
                     ValidIssuer = appSettings.Emissor
                 };
             });
-
-            return services;
         }
     }
 }
