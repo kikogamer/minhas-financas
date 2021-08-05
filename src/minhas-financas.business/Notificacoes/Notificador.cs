@@ -1,4 +1,5 @@
 ﻿using minhas_financas.business.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -15,6 +16,9 @@ namespace minhas_financas.business.Notificacoes
 
         public void Handle(Notificacao notificacao)
         {
+            if (notificacao == null)
+                throw new ArgumentException("notificação inválida, adicione uma notificação válida.");
+
             _notificacoes.Add(notificacao);
         }
 

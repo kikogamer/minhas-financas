@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "minhas-financas.business", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "minhas-financas.data", "src\minhas-financas.data\minhas-financas.data.csproj", "{7AD4AB7C-CAC5-4B20-8311-4AA33317AC97}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "minhas-financas.api.ut", "src\minhas-financas.api.ut\minhas-financas.api.ut.csproj", "{BC714873-36F5-41C2-97BF-88DFA18A398C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "minhas-financas.api.ut", "src\minhas-financas.api.ut\minhas-financas.api.ut.csproj", "{BC714873-36F5-41C2-97BF-88DFA18A398C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "minhas-financas.business.ut", "src\minhas-financas.business.ut\minhas-financas.business.ut.csproj", "{A53E88EB-1154-44D2-B0E8-44E51F464A13}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{BC714873-36F5-41C2-97BF-88DFA18A398C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC714873-36F5-41C2-97BF-88DFA18A398C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC714873-36F5-41C2-97BF-88DFA18A398C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A53E88EB-1154-44D2-B0E8-44E51F464A13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A53E88EB-1154-44D2-B0E8-44E51F464A13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A53E88EB-1154-44D2-B0E8-44E51F464A13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A53E88EB-1154-44D2-B0E8-44E51F464A13}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
