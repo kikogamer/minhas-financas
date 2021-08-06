@@ -12,7 +12,7 @@ namespace minhas_financas.api.Controllers
     {
         private readonly INotificador _notificador;
 
-        public MainController(INotificador notificador)
+        protected MainController(INotificador notificador)
         {
             _notificador = notificador;
         }

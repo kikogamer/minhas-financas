@@ -9,5 +9,6 @@ namespace minhas_financas.api.Extensions
         public virtual int ExpiracaoHoras { get; set; }
         public virtual string Emissor { get; set; }
         public virtual string ValidoEm { get; set; }
+        public virtual string LicenseURI { get; set; }
     }
 }

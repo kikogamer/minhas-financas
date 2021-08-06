@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using minhas_financas.api.Extensions;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -43,19 +44,26 @@ namespace minhas_financas.api.Configuration
     public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
     {
         readonly IApiVersionDescriptionProvider provider;
+        private readonly AppSettings _appSettings;
 
-        public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider) => this.provider = provider;
+        public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider, IOptions<AppSettings> appSettings)
+        {
+            this.provider = provider;
+            _appSettings = appSettings.Value;
+        }
 
         public void Configure(SwaggerGenOptions options)
         {
             foreach (var description in provider.ApiVersionDescriptions)
             {
-                options.SwaggerGeneratorOptions.SwaggerDocs.Add(description.GroupName, 
-                                                                CreateInfoForApiVersion(description));
+                options.SwaggerGeneratorOptions.SwaggerDocs.Add(
+                    description.GroupName, 
+                    CreateInfoForApiVersion(description, _appSettings.LicenseURI)
+                );
             }
         }
 
-        static OpenApiInfo CreateInfoForApiVersion(ApiVersionDescription description)
+        static OpenApiInfo CreateInfoForApiVersion(ApiVersionDescription description, string licenseURI)
         {
             var info = new OpenApiInfo()
             {
@@ -63,8 +71,8 @@ namespace minhas_financas.api.Configuration
                 Version = description.ApiVersion.ToString(),
                 Description = "API do Web App Minhas Finanças Web.",
                 Contact = new OpenApiContact() { Name = "Ronaldo Carneiro", Email = "kikogamer@gmail.com" },
-                TermsOfService = new System.Uri("https://opensource.org/licenses/MIT"),
-                License = new OpenApiLicense() { Name = "MIT", Url = new System.Uri("https://opensource.org/licenses/MIT") }
+                TermsOfService = new System.Uri(licenseURI),
+                License = new OpenApiLicense() { Name = "MIT", Url = new System.Uri(licenseURI) }
             };
 
             if (description.IsDeprecated)

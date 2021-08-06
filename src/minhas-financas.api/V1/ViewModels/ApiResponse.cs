@@ -6,7 +6,7 @@ namespace minhas_financas.api.V1.ViewModels
     {
         public bool Success { get; }
 
-        public ApiResponse(bool success)
+        protected ApiResponse(bool success)
         {
             Success = success;
         }
