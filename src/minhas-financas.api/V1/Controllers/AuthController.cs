@@ -17,7 +17,8 @@ namespace minhas_financas.api.V1.Controllers
 
         public AuthController(INotificador notificador,
                               SignInManager<IdentityUser> signInManager,
-                              JwtGeradorToken geradorToken) : base(notificador)
+                              JwtGeradorToken geradorToken,
+                              IUser appUser) : base(notificador, appUser)
         {
             _signInManager = signInManager;
             _geradorToken = geradorToken;

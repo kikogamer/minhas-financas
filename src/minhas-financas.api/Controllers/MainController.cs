@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using minhas_financas.api.V1.ViewModels;
 using minhas_financas.business.Interfaces;
 using minhas_financas.business.Notificacoes;
+using System;
 using System.Linq;
 
 namespace minhas_financas.api.Controllers
@@ -11,10 +12,14 @@ namespace minhas_financas.api.Controllers
     public abstract class MainController : ControllerBase
     {
         private readonly INotificador _notificador;
+        public readonly IUser AppUser;
+        protected Guid UsuarioId => AppUser != null ? AppUser.GetUserId() : Guid.Empty;
+        protected bool UsuarioAutenticado => AppUser != null && AppUser.IsAuthenticated();
 
-        protected MainController(INotificador notificador)
+        protected MainController(INotificador notificador, IUser appUser)
         {
             _notificador = notificador;
+            AppUser = appUser;
         }
 
         protected bool OperacaoValida()

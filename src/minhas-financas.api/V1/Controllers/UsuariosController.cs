@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using minhas_financas.api.Controllers;
 using minhas_financas.api.Extensions;
@@ -11,6 +12,7 @@ namespace minhas_financas.api.V1.Controllers
 {
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/usuarios")]
+    [Authorize]
     public class UsuariosController : MainController
     {
         private readonly SignInManager<IdentityUser> _signInManager;
@@ -20,21 +22,23 @@ namespace minhas_financas.api.V1.Controllers
         public UsuariosController(INotificador notificador,
                                   SignInManager<IdentityUser> signInManager,
                                   UserManager<IdentityUser> userManager,
-                                  JwtGeradorToken geradorToken) : base(notificador)
+                                  JwtGeradorToken geradorToken,
+                                  IUser appUser) : base(notificador, appUser)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _geradorToken = geradorToken;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
         public ActionResult Obter(Guid id)
         {
             return CustomResponse();
         }
 
+        [AllowAnonymous]
         [HttpPost]
-        public async Task<ActionResult> Adicionar(UserViewModel createUser)
+        public async Task<ActionResult> Adicionar(CreateUserViewModel createUser)
         {
             if (!ModelState.IsValid) return CustomResponse(ModelState);
 
@@ -59,6 +63,31 @@ namespace minhas_financas.api.V1.Controllers
             }
 
             return CustomResponse(createUser);
+        }
+
+        [HttpPut("{id:guid}")]
+        public async Task<ActionResult> Alterar(Guid id, EditUserViewModel editUser)
+        {
+            if (!UsuarioAutenticado || UsuarioId != id) return NotFound();
+
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
+            
+            if (editUser == null || id != editUser.Id)
+            {
+                NotificarErro("O id informado não é o mesmo que foi passado na query");
+                return CustomResponse(editUser);
+            }
+            
+            var usuarioAtualizacao = await _userManager.FindByIdAsync(UsuarioId.ToString());
+
+            if (usuarioAtualizacao == null) return NotFound();
+
+            usuarioAtualizacao.UserName = editUser.Nome;
+            usuarioAtualizacao.Email = editUser.Email;
+
+            await _userManager.UpdateAsync(usuarioAtualizacao);
+
+            return CustomResponse(editUser);
         }
     }
 }

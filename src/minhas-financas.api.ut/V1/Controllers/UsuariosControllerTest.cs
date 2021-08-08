@@ -22,6 +22,7 @@ namespace minhas_financas.api.ut.V1.Controllers
         private readonly Mock<UserManager<IdentityUser>> _mockUserManager;
         private readonly Mock<SignInManager<IdentityUser>> _mockSignInManager;
         private readonly Mock<JwtGeradorToken> _mockJwtGeradorToken;
+        private readonly Mock<IUser> _mockAppUser;
         private readonly UsuariosController _controller;
 
         public UsuariosControllerTest()
@@ -45,10 +46,12 @@ namespace minhas_financas.api.ut.V1.Controllers
                                                                        null,
                                                                        null);
             _mockJwtGeradorToken = new Mock<JwtGeradorToken>();
+            _mockAppUser = new Mock<IUser>();
             _controller = new UsuariosController(_mockNotificador.Object,
                                                  _mockSignInManager.Object,
                                                  _mockUserManager.Object,
-                                                 _mockJwtGeradorToken.Object);
+                                                 _mockJwtGeradorToken.Object,
+                                                 _mockAppUser.Object);
         }
 
         [Fact]
@@ -60,7 +63,8 @@ namespace minhas_financas.api.ut.V1.Controllers
             
             foreach (var notificacao in notificacoes)
             {
-                _controller.ModelState.AddModelError(_fixture.Create<string>(), notificacao.Mensagem);
+                _controller.ModelState.TryAddModelException(_fixture.Create<string>(), 
+                                                            _fixture.Create<Exception>());
             }
 
             var result = await _controller.Adicionar(createUser: null);
@@ -80,7 +84,7 @@ namespace minhas_financas.api.ut.V1.Controllers
             _mockJwtGeradorToken.Setup(geradorToken => geradorToken.GerarToken(It.IsAny<string>()))
                 .ReturnsAsync(_fixture.Create<LoginResponseViewModel>());
 
-            var createUser = _fixture.Create<UserViewModel>();
+            var createUser = _fixture.Create<CreateUserViewModel>();
             var result = await _controller.Adicionar(createUser);
             var returnValue = Assert.IsType<CreatedAtActionResult>(result);
             var createdResponse = Assert.IsType<ApiCreatedResponse>(returnValue.Value);
@@ -102,7 +106,7 @@ namespace minhas_financas.api.ut.V1.Controllers
             _mockJwtGeradorToken.Setup(geradorToken => geradorToken.GerarToken(It.IsAny<string>()))
                 .ReturnsAsync(_fixture.Create<LoginResponseViewModel>());
 
-            var createUser = _fixture.Create<UserViewModel>();
+            var createUser = _fixture.Create<CreateUserViewModel>();
             var result = await _controller.Adicionar(createUser);
             var returnValue = Assert.IsType<BadRequestObjectResult>(result);
             var badRequestResponse = Assert.IsType<ApiBadRequestResponse>(returnValue.Value);
@@ -124,12 +128,134 @@ namespace minhas_financas.api.ut.V1.Controllers
             _mockJwtGeradorToken.Setup(geradorToken => geradorToken.GerarToken(It.IsAny<string>()))
                 .ReturnsAsync(_fixture.Create<LoginResponseViewModel>());
 
-            var createUser = _fixture.Create<UserViewModel>();
+            var createUser = _fixture.Create<CreateUserViewModel>();
             var result = await _controller.Adicionar(createUser);
             var returnValue = Assert.IsType<BadRequestObjectResult>(result);
             var badRequestResponse = Assert.IsType<ApiBadRequestResponse>(returnValue.Value);
             Assert.False(badRequestResponse.Success);
             Assert.Equal(badRequestResponse.Erros, notificacoes.Select(n => n.Mensagem).ToList());
+        }
+
+        [Fact]
+        public async Task Adicionar_RetornaBadRequest_QuandoIdEhInvalido()
+        {
+            var notificacoes = _fixture.CreateMany<Notificacao>().ToList();
+            _mockNotificador.Setup(notificador => notificador.TemNotificacao()).Returns(true);
+            _mockNotificador.Setup(notificador => notificador.ObterNotificacoes()).Returns(notificacoes);
+
+            var id = _fixture.Create<Guid>();
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
+            _mockAppUser.Setup(user => user.GetUserId()).Returns(id);
+                       
+            var result = await _controller.Alterar(id, _fixture.Create<EditUserViewModel>());
+            var returnValue = Assert.IsType<BadRequestObjectResult>(result);
+            var badRequestResponse = Assert.IsType<ApiBadRequestResponse>(returnValue.Value);
+            Assert.False(badRequestResponse.Success);
+            Assert.Equal(badRequestResponse.Erros, notificacoes.Select(n => n.Mensagem).ToList());
+        }
+
+        [Fact]
+        public async Task Adicionar_RetornaBadRequest_QuandoIdNaoEhInformado()
+        {
+            var notificacoes = _fixture.CreateMany<Notificacao>().ToList();
+            _mockNotificador.Setup(notificador => notificador.TemNotificacao()).Returns(true);
+            _mockNotificador.Setup(notificador => notificador.ObterNotificacoes()).Returns(notificacoes);
+
+            var id = _fixture.Create<Guid>();
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
+            _mockAppUser.Setup(user => user.GetUserId()).Returns(id);
+
+            var result = await _controller.Alterar(id, editUser: null);
+            var returnValue = Assert.IsType<BadRequestObjectResult>(result);
+            var badRequestResponse = Assert.IsType<ApiBadRequestResponse>(returnValue.Value);
+            Assert.False(badRequestResponse.Success);
+            Assert.Equal(badRequestResponse.Erros, notificacoes.Select(n => n.Mensagem).ToList());
+        }
+
+        [Fact]
+        public async Task Alterar_RetornaBadRequest_QuandoModelEhInvalido()
+        {
+            var notificacoes = _fixture.CreateMany<Notificacao>().ToList();
+            _mockNotificador.Setup(notificador => notificador.TemNotificacao()).Returns(true);
+            _mockNotificador.Setup(notificador => notificador.ObterNotificacoes()).Returns(notificacoes);
+
+            var id = _fixture.Create<Guid>();
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
+            _mockAppUser.Setup(user => user.GetUserId()).Returns(id);
+
+            foreach (var notificacao in notificacoes)
+            {
+                _controller.ModelState.TryAddModelException(_fixture.Create<string>(), 
+                                                            _fixture.Create<Exception>());
+            }
+
+            var result = await _controller.Alterar(id, editUser: null);
+            var returnValue = Assert.IsType<BadRequestObjectResult>(result);
+            var badRequestResponse = Assert.IsType<ApiBadRequestResponse>(returnValue.Value);
+            Assert.False(badRequestResponse.Success);
+            Assert.Equal(badRequestResponse.Erros, notificacoes.Select(n => n.Mensagem).ToList());
+        }
+
+        [Fact]
+        public async Task Alterar_RetornaNotFound_QuandoUsuarioNaoEstaAutenticado()
+        {
+            var notificacoes = _fixture.CreateMany<Notificacao>().ToList();
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(false);
+
+            foreach (var notificacao in notificacoes)
+            {
+                _controller.ModelState.TryAddModelException(_fixture.Create<string>(),
+                                                            _fixture.Create<Exception>());
+            }
+
+            var result = await _controller.Alterar(_fixture.Create<Guid>(), editUser: null);
+            var returnValue = Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Alterar_RetornaNotFound_QuandoUsuarioEhDiferenteDoAutenticado()
+        {
+            var notificacoes = _fixture.CreateMany<Notificacao>().ToList();
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
+            _mockAppUser.Setup(user => user.GetUserId()).Returns(_fixture.Create<Guid>());
+
+            foreach (var notificacao in notificacoes)
+            {
+                _controller.ModelState.TryAddModelException(_fixture.Create<string>(),
+                                                            _fixture.Create<Exception>());
+            }
+
+            var result = await _controller.Alterar(_fixture.Create<Guid>(), editUser: null);
+            var returnValue = Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Alterar_RetornaNotFound_QuandoUsuarioNaoExiste()
+        {
+            var editUser = _fixture.Create<EditUserViewModel>();
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
+            _mockAppUser.Setup(user => user.GetUserId()).Returns(editUser.Id);
+
+            var result = await _controller.Alterar(editUser.Id, editUser);
+            var returnValue = Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Adicionar_RetornaOk_QuandoModelEhValido()
+        {
+            _mockUserManager.Setup(userManager =>
+                userManager.FindByIdAsync(It.IsAny<string>()))
+                    .ReturnsAsync(_fixture.Create<IdentityUser>);
+
+            var editUser = _fixture.Create<EditUserViewModel>();
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
+            _mockAppUser.Setup(user => user.GetUserId()).Returns(editUser.Id);
+
+            var result = await _controller.Alterar(editUser.Id, editUser);
+            var returnValue = Assert.IsType<OkObjectResult>(result);
+            var okResponse = Assert.IsType<ApiOkResponse>(returnValue.Value);
+            Assert.True(okResponse.Success);
+            Assert.IsType<EditUserViewModel>(okResponse.Data);
         }
 
         [Fact]

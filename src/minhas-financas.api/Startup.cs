@@ -50,10 +50,12 @@ namespace minhas_financas.api
                 app.UseSwaggerConfiguration(provider);
             }
 
-            app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseWebApiConfiguration();
 
+            app.UseAuthorization();
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

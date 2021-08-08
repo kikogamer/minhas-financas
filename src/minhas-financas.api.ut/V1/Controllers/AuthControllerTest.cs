@@ -43,9 +43,11 @@ namespace minhas_financas.api.ut.V1.Controllers
                                                                        null,
                                                                        null);
             _mockJwtGeradorToken = new Mock<JwtGeradorToken>();
+            var mockAppUser = new Mock<IUser>();
             _controller = new AuthController(_mockNotificador.Object,
                                              _mockSignInManager.Object,
-                                             _mockJwtGeradorToken.Object);
+                                             _mockJwtGeradorToken.Object,
+                                             mockAppUser.Object);
         }
 
         [Fact]
