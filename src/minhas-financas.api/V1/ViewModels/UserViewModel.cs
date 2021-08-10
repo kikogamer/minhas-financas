@@ -29,7 +29,7 @@ namespace minhas_financas.api.V1.ViewModels
         public string Password { get; set; }
     }
 
-    public class EditUserViewModel
+    public class UserViewModel
     {
         [Key]
         public Guid Id { get; set; }
@@ -42,6 +42,8 @@ namespace minhas_financas.api.V1.ViewModels
         [EmailAddress(ErrorMessage = "O campo {0} está em formato inválido")]
         public string Email { get; set; }
     }
+
+    public class EditUserViewModel : UserViewModel { }
 
     public class ClaimViewModel
     {

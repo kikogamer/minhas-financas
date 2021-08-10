@@ -31,9 +31,22 @@ namespace minhas_financas.api.V1.Controllers
         }
 
         [HttpGet("{id:guid}")]
-        public ActionResult Obter(Guid id)
+        public async Task<ActionResult> Obter(Guid id)
         {
-            return CustomResponse();
+            if (!UsuarioAutenticado || UsuarioId != id) return NotFound();
+
+            var usuario = await _userManager.FindByIdAsync(id.ToString());
+
+            if (usuario == null) return NotFound();
+
+            var userView = new UserViewModel()
+            {
+                Id = id,
+                Nome = usuario.UserName,
+                Email = usuario.Email
+            };
+
+            return CustomResponse(userView);
         }
 
         [AllowAnonymous]
@@ -78,7 +91,7 @@ namespace minhas_financas.api.V1.Controllers
                 return CustomResponse(editUser);
             }
             
-            var usuarioAtualizacao = await _userManager.FindByIdAsync(UsuarioId.ToString());
+            var usuarioAtualizacao = await _userManager.FindByIdAsync(id.ToString());
 
             if (usuarioAtualizacao == null) return NotFound();
 

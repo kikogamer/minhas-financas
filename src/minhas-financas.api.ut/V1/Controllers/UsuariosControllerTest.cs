@@ -218,13 +218,7 @@ namespace minhas_financas.api.ut.V1.Controllers
             var notificacoes = _fixture.CreateMany<Notificacao>().ToList();
             _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
             _mockAppUser.Setup(user => user.GetUserId()).Returns(_fixture.Create<Guid>());
-
-            foreach (var notificacao in notificacoes)
-            {
-                _controller.ModelState.TryAddModelException(_fixture.Create<string>(),
-                                                            _fixture.Create<Exception>());
-            }
-
+                        
             var result = await _controller.Alterar(_fixture.Create<Guid>(), editUser: null);
             var returnValue = Assert.IsType<NotFoundResult>(result);
         }
@@ -241,7 +235,7 @@ namespace minhas_financas.api.ut.V1.Controllers
         }
 
         [Fact]
-        public async Task Adicionar_RetornaOk_QuandoModelEhValido()
+        public async Task Alterar_RetornaOk_QuandoModelEhValido()
         {
             _mockUserManager.Setup(userManager =>
                 userManager.FindByIdAsync(It.IsAny<string>()))
@@ -259,12 +253,59 @@ namespace minhas_financas.api.ut.V1.Controllers
         }
 
         [Fact]
-        public void Obter_RetornaOk()
+        public async Task Obter_RetornaNotFound_QuandoUsuarioEhDiferenteDoAutenticado()
         {
-            var result = _controller.Obter(Guid.NewGuid());
+            var notificacoes = _fixture.CreateMany<Notificacao>().ToList();
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
+            _mockAppUser.Setup(user => user.GetUserId()).Returns(_fixture.Create<Guid>());
+
+            var result = await _controller.Obter(_fixture.Create<Guid>());
+            var returnValue = Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Obter_RetornaNotFound_QuandoUsuarioNaoEstaAutenticado()
+        {
+            var notificacoes = _fixture.CreateMany<Notificacao>().ToList();
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(false);
+
+            foreach (var notificacao in notificacoes)
+            {
+                _controller.ModelState.TryAddModelException(_fixture.Create<string>(),
+                                                            _fixture.Create<Exception>());
+            }
+
+            var result = await _controller.Obter(_fixture.Create<Guid>());
+            var returnValue = Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Obter_RetornaNotFound_QuandoUsuarioNaoExiste()
+        {
+            var editUser = _fixture.Create<EditUserViewModel>();
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
+            _mockAppUser.Setup(user => user.GetUserId()).Returns(editUser.Id);
+
+            var result = await _controller.Obter(editUser.Id);
+            var returnValue = Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Obter_RetornaOk_QuandoModelEhValido()
+        {
+            _mockUserManager.Setup(userManager =>
+                userManager.FindByIdAsync(It.IsAny<string>()))
+                    .ReturnsAsync(_fixture.Create<IdentityUser>);
+
+            var id = _fixture.Create<Guid>();
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
+            _mockAppUser.Setup(user => user.GetUserId()).Returns(id);
+
+            var result = await _controller.Obter(id);
             var returnValue = Assert.IsType<OkObjectResult>(result);
             var okResponse = Assert.IsType<ApiOkResponse>(returnValue.Value);
             Assert.True(okResponse.Success);
+            Assert.IsType<UserViewModel>(okResponse.Data);
         }
     }
 }
