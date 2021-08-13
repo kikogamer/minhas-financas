@@ -48,13 +48,13 @@ namespace minhas_financas.api.Extensions
     [ExcludeFromCodeCoverage]
     public static class ClaimsPrincipalExtension
     {
+        private const string MESSAGE = "Parâmetro do tipo {0} não pode ser nulo.";
+
         public static string GetUserId(this ClaimsPrincipal principal)
         {
             if (principal == null)
-            {
-                throw new ArgumentException(nameof(principal));
-            }
-
+                throw new ArgumentException(string.Format(MESSAGE, nameof(principal)));
+            
             var claim = principal.FindFirst(ClaimTypes.NameIdentifier);
             return claim?.Value;
         }
@@ -62,10 +62,8 @@ namespace minhas_financas.api.Extensions
         public static string GetUserEmail(this ClaimsPrincipal principal)
         {
             if (principal == null)
-            {
-                throw new ArgumentException(nameof(principal));
-            }
-
+                throw new ArgumentException(string.Format(MESSAGE, nameof(principal)));
+            
             var claim = principal.FindFirst(ClaimTypes.Email);
             return claim?.Value;
         }

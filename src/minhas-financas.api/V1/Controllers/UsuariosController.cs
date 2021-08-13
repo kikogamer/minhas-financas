@@ -33,7 +33,7 @@ namespace minhas_financas.api.V1.Controllers
         [HttpGet("{id:guid}")]
         public async Task<ActionResult> Obter(Guid id)
         {
-            if (!UsuarioAutenticado || UsuarioId != id) return NotFound();
+            if (!UsuarioAutenticado() || GetUsuarioId() != id) return NotFound();
 
             var usuario = await _userManager.FindByIdAsync(id.ToString());
 
@@ -81,7 +81,7 @@ namespace minhas_financas.api.V1.Controllers
         [HttpPut("{id:guid}")]
         public async Task<ActionResult> Alterar(Guid id, EditUserViewModel editUser)
         {
-            if (!UsuarioAutenticado || UsuarioId != id) return NotFound();
+            if (!UsuarioAutenticado() || GetUsuarioId() != id) return NotFound();
 
             if (!ModelState.IsValid) return CustomResponse(ModelState);
             

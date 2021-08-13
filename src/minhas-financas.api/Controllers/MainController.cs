@@ -13,20 +13,18 @@ namespace minhas_financas.api.Controllers
     {
         private readonly INotificador _notificador;
         public readonly IUser AppUser;
-        protected Guid UsuarioId => AppUser != null ? AppUser.GetUserId() : Guid.Empty;
-        protected bool UsuarioAutenticado => AppUser != null && AppUser.IsAuthenticated();
-
+        
         protected MainController(INotificador notificador, IUser appUser)
         {
             _notificador = notificador;
             AppUser = appUser;
         }
 
-        protected bool OperacaoValida()
+        protected Guid GetUsuarioId()
         {
-            return !_notificador.TemNotificacao();
+            return AppUser.GetUserId();
         }
-
+                
         protected ActionResult CustomCreatedResponse(string uri, string id, object result = null)
         {
             if (OperacaoValida())
@@ -64,5 +62,16 @@ namespace minhas_financas.api.Controllers
         {
             _notificador.Handle(new Notificacao(mensagem));
         }
+
+        protected bool OperacaoValida()
+        {
+            return !_notificador.TemNotificacao();
+        }
+
+        protected bool UsuarioAutenticado()
+        {
+            return AppUser.IsAuthenticated();
+        }
+
     }
 }

@@ -195,7 +195,7 @@ namespace minhas_financas.api.ut.V1.Controllers
             Assert.False(badRequestResponse.Success);
             Assert.Equal(badRequestResponse.Erros, notificacoes.Select(n => n.Mensagem).ToList());
         }
-
+                
         [Fact]
         public async Task Alterar_RetornaNotFound_QuandoUsuarioNaoEstaAutenticado()
         {
