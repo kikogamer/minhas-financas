@@ -33,6 +33,15 @@ namespace minhas_financas.api.Controllers
             var erros = _notificador.ObterNotificacoes().Select(n => n.Mensagem).ToList();
             return BadRequest(new ApiBadRequestResponse(false, erros));
         }
+
+        protected ActionResult CustomNoContentResponse()
+        {
+            if (OperacaoValida())
+                return NoContent();
+
+            var erros = _notificador.ObterNotificacoes().Select(n => n.Mensagem).ToList();
+            return BadRequest(new ApiBadRequestResponse(false, erros));
+        }
                 
         protected ActionResult CustomResponse(object result = null)
         {

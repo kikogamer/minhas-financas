@@ -30,24 +30,6 @@ namespace minhas_financas.api.V1.Controllers
             _geradorToken = geradorToken;
         }
 
-        [HttpGet("{id:guid}")]
-        public async Task<ActionResult> Obter(Guid id)
-        {
-            if (!UsuarioAutenticado() || GetUsuarioId() != id) return NotFound();
-
-            var usuario = await _userManager.FindByIdAsync(id.ToString());
-
-            if (usuario == null) return NotFound();
-
-            var userView = new UserViewModel()
-            {
-                Id = id,
-                Nome = usuario.UserName,
-                Email = usuario.Email
-            };
-
-            return CustomResponse(userView);
-        }
 
         [AllowAnonymous]
         [HttpPost]
@@ -101,6 +83,41 @@ namespace minhas_financas.api.V1.Controllers
             await _userManager.UpdateAsync(usuarioAtualizacao);
 
             return CustomResponse(editUser);
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<ActionResult> Excluir(Guid id)
+        {
+            if (!UsuarioAutenticado() || GetUsuarioId() != id) return NotFound();
+
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
+
+            var usuarioExclusao = await _userManager.FindByIdAsync(id.ToString());
+
+            if (usuarioExclusao == null) return NotFound();
+
+            await _userManager.DeleteAsync(usuarioExclusao);
+
+            return CustomNoContentResponse();
+        }
+
+        [HttpGet("{id:guid}")]
+        public async Task<ActionResult> Obter(Guid id)
+        {
+            if (!UsuarioAutenticado() || GetUsuarioId() != id) return NotFound();
+
+            var usuario = await _userManager.FindByIdAsync(id.ToString());
+
+            if (usuario == null) return NotFound();
+
+            var userView = new UserViewModel()
+            {
+                Id = id,
+                Nome = usuario.UserName,
+                Email = usuario.Email
+            };
+
+            return CustomResponse(userView);
         }
     }
 }

@@ -199,14 +199,7 @@ namespace minhas_financas.api.ut.V1.Controllers
         [Fact]
         public async Task Alterar_RetornaNotFound_QuandoUsuarioNaoEstaAutenticado()
         {
-            var notificacoes = _fixture.CreateMany<Notificacao>().ToList();
             _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(false);
-
-            foreach (var notificacao in notificacoes)
-            {
-                _controller.ModelState.TryAddModelException(_fixture.Create<string>(),
-                                                            _fixture.Create<Exception>());
-            }
 
             var result = await _controller.Alterar(_fixture.Create<Guid>(), editUser: null);
             var returnValue = Assert.IsType<NotFoundResult>(result);
@@ -215,7 +208,6 @@ namespace minhas_financas.api.ut.V1.Controllers
         [Fact]
         public async Task Alterar_RetornaNotFound_QuandoUsuarioEhDiferenteDoAutenticado()
         {
-            var notificacoes = _fixture.CreateMany<Notificacao>().ToList();
             _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
             _mockAppUser.Setup(user => user.GetUserId()).Returns(_fixture.Create<Guid>());
                         
@@ -250,6 +242,100 @@ namespace minhas_financas.api.ut.V1.Controllers
             var okResponse = Assert.IsType<ApiOkResponse>(returnValue.Value);
             Assert.True(okResponse.Success);
             Assert.IsType<EditUserViewModel>(okResponse.Data);
+        }
+
+        [Fact]
+        public async Task Excluir_RetornaBadRequest_QuandoModelEhInvalido()
+        {
+            var notificacoes = _fixture.CreateMany<Notificacao>().ToList();
+            _mockNotificador.Setup(notificador => notificador.TemNotificacao()).Returns(true);
+            _mockNotificador.Setup(notificador => notificador.ObterNotificacoes()).Returns(notificacoes);
+
+            var id = _fixture.Create<Guid>();
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
+            _mockAppUser.Setup(user => user.GetUserId()).Returns(id);
+
+            foreach (var notificacao in notificacoes)
+            {
+                _controller.ModelState.TryAddModelException(_fixture.Create<string>(),
+                                                            _fixture.Create<Exception>());
+            }
+
+            var result = await _controller.Excluir(id);
+            var returnValue = Assert.IsType<BadRequestObjectResult>(result);
+            var badRequestResponse = Assert.IsType<ApiBadRequestResponse>(returnValue.Value);
+            Assert.False(badRequestResponse.Success);
+            Assert.Equal(badRequestResponse.Erros, notificacoes.Select(n => n.Mensagem).ToList());
+        }
+
+        [Fact]
+        public async Task Excluir_RetornaBadRequest_QuandoNaoConsegueExcluirUsuario()
+        {
+            var notificacoes = _fixture.CreateMany<Notificacao>().ToList();
+            _mockNotificador.Setup(notificador => notificador.TemNotificacao()).Returns(true);
+            _mockNotificador.Setup(notificador => notificador.ObterNotificacoes()).Returns(notificacoes);
+
+            var id = _fixture.Create<Guid>();
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
+            _mockAppUser.Setup(user => user.GetUserId()).Returns(id);
+
+            _mockUserManager.Setup(userManager =>
+                userManager.FindByIdAsync(It.IsAny<string>()))
+                    .ReturnsAsync(_fixture.Create<IdentityUser>);
+            _mockUserManager.Setup(userManager =>
+                userManager.DeleteAsync(It.IsAny<IdentityUser>()))
+                    .ReturnsAsync(IdentityResult.Failed(_fixture.CreateMany<IdentityError>().ToArray()));
+
+            var result = await _controller.Excluir(id);
+            var returnValue = Assert.IsType<BadRequestObjectResult>(result);
+            var badRequestResponse = Assert.IsType<ApiBadRequestResponse>(returnValue.Value);
+            Assert.False(badRequestResponse.Success);
+            Assert.Equal(badRequestResponse.Erros, notificacoes.Select(n => n.Mensagem).ToList());
+        }
+
+        [Fact]
+        public async Task Excluir_RetornaNotFound_QuandoUsuarioNaoEstaAutenticado()
+        {
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(false);
+                        
+            var result = await _controller.Excluir(_fixture.Create<Guid>());
+            var returnValue = Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Excluir_RetornaNotFound_QuandoUsuarioEhDiferenteDoAutenticado()
+        {
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
+            _mockAppUser.Setup(user => user.GetUserId()).Returns(_fixture.Create<Guid>());
+
+            var result = await _controller.Excluir(_fixture.Create<Guid>());
+            var returnValue = Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Excluir_RetornaNotFound_QuandoUsuarioNaoExiste()
+        {
+            var id = _fixture.Create<Guid>();
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
+            _mockAppUser.Setup(user => user.GetUserId()).Returns(id);
+
+            var result = await _controller.Excluir(id);
+            var returnValue = Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Excluir_RetornaNoContent_QuandoModelEhValido()
+        {
+            _mockUserManager.Setup(userManager =>
+                userManager.FindByIdAsync(It.IsAny<string>()))
+                    .ReturnsAsync(_fixture.Create<IdentityUser>);
+
+            var id = _fixture.Create<Guid>();
+            _mockAppUser.Setup(user => user.IsAuthenticated()).Returns(true);
+            _mockAppUser.Setup(user => user.GetUserId()).Returns(id);
+
+            var result = await _controller.Excluir(id);
+            Assert.IsType<NoContentResult>(result);
         }
 
         [Fact]
